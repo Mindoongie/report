@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Project 4.1 | Phân tích dữ liệu Khách sạn</title>
+
+    <link rel="stylesheet" href="revealjs/dist/reset.css">
+    <link rel="stylesheet" href="revealjs/dist/reveal.css" />
+    <link rel="stylesheet" href="revealjs/dist/theme/white.css" />
+
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css">
+
+    <link rel="stylesheet" href="lecture-style.css">
+
+    <!-- Style cho placeholder ảnh -->
+    <style>
+        .img-placeholder {
+            width: 90%;
+            height: 350px;
+            border: 2px dashed #e74c3c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            background-color: #fff0f0;
+            color: #c0392b;
+            font-weight: bold;
+            text-align: center;
+        }
+        .two-col { display: flex; justify-content: space-between; gap: 20px; }
+        .col { flex: 1; text-align: left; }
+        ul { font-size: 0.9em; }
+        li { margin-bottom: 8px; }
+    </style>
+</head>
+
+<body>
+<div class="reveal">
+    <div class="slides">
+        <section>
+            <h4>BÁO CÁO KỸ THUẬT</h4>
+            <h2>PHÂN TÍCH DỮ LIỆU ĐẶT PHÒNG KHÁCH SẠN THEO THỜI GIAN/THÀNH PHỐ</h2>
+            <div>
+                <p>
+                    <strong>Thành viên:</strong>
+                </p>
+                <ul>
+                    <li>Phạm Tùng Lâm – 24022380</li>
+                    <li>Lê Hồng Phương Chi – 24022270</li>
+                    <li>Nguyễn Minh Khoa – 24022368</li>
+                </ul>
+            </div>
+        </section>
+
+        <section data-markdown>
+    <textarea data-template>
+## Mục lục
+
+<div class="two-col" style="font-size: 0.8em;">
+                <div class="col">
+                    <ol>
+                        <li>Thông tin cơ bản</li>
+                        <li>Giới thiệu & Dữ liệu</li>
+                        <li>Đảm bảo chất lượng dữ liệu (Data QA)</li>
+                        <li>Quy trình tính toán KPI</li>
+                    </ol>
+                </div>
+                <div class="col">
+                    <ol start="5">
+                        <li>Trực quan hoá và Phân tích dữ liệu</li>
+                        <li>Các tính năng nâng cao</li>
+                        <li>Kết luận</li>
+                        <li>Tài liệu tham khảo</li>
+                    </ol>
+                </div>
+            </div>
+</textarea>
+        </section>
+
+        <section>
+            <section>
+                <h2 class="r-fit-text">Thông tin cơ bản</h2>
+            </section>
+            <section>
+                <h2>Tên dự án: project 4.1</h2>
+                <ul>
+                    <li><strong>Github:</strong>
+                        <!-- [CHỖ GẮN LINK GITHUB] -->
+                        <a href="https://github.com/limlim12-blip/2526-LTXLDL-Project-AIT2006-4-4.1">2526-LTXLDL-Project-AIT2006-4-4.1</a>
+                    </li>
+                    <li><strong>Ngày nộp báo cáo:</strong> 19/12/2025</li>
+                    <li><strong>Commit hash cuối cùng:</strong> <code>6b097c0</code></li>
+                </ul>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h2 class="r-fit-text">Giới thiệu & Dữ liệu</h2>
+            </section>
+            <section>
+                <h1>Giới thiệu</h1>
+                <ul>
+                    <li><strong>Nguồn dữ liệu:</strong>
+                        <a href="https://insideairbnb.com/get-the-data/">Inside Airbnb</a>
+                    </li>
+                    <li><strong>Phạm vi nghiên cứu (3 thành phố):</strong>
+                        <ul>
+                            <li>Bangkok: 2024-12-25, 2025-03-19, 2025-06-24</li>
+                            <li>Taipei: 2024-12-31, 2025-03-28, 2025-06-29.</li>
+                            <li>Singapore: 2024-12-28, 2025-03-21, 2025-06-25, 2025-09-28.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <h2>Cấu trúc & Trường dữ liệu</h2>
+                <div class="two-col">
+                    <div class="col">
+                        <strong>Cấu trúc Tệp:</strong>
+                        <pre><code class="bash">
+|– raw/ (Dữ liệu thô)
+|– processed/ (Đã làm sạch/KPI)
+|– figures/ (Hình ảnh)
+|– reports/ (Báo cáo)
+|– src/ (Notebooks/Scripts)
+|– README.md (Hướng dẫn)
+|– requirements.txt (Thư viện)
+                    </code></pre>
+                    </div>
+                    <div class="col">
+                        <strong>Trường dữ liệu chính:</strong>
+                        <ul>
+                            <li>price</li>
+                            <li>room_type</li>
+                            <li>neighbourhood</li>
+                            <li>latitude, longitude</li>
+                            <li>host_id</li>
+                            <li>number_of_reviews</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h1>ĐẢM BẢO CHẤT LƯỢNG DỮ LIỆU (DATA QA)</h1>
+            </section>
+            <section>
+                <h2>Chiến lược QA Tổng thể</h2>
+                <ul>
+                    <li>Ưu tiên gắn cờ lỗi (Flagging) thay vì xóa bỏ.</li>
+                    <li>Tập trung vào 3 nhóm vấn đề:
+                        <ol>
+                            <li>Sửa lỗi Kiểu Dữ liệu (Dtype Fix)</li>
+                            <li>Xử lý Ngoại lệ (Outlier Handling)</li>
+                            <li>Chuẩn hóa (Normalization)</li>
+                        </ol>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <h3>Quy tắc QA và Chuẩn hoá Chi tiết</h3>
+                <div style="font-size: 0.65em;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                        <tr style="background-color: #f2f2f2; border-bottom: 2px solid #333;">
+                            <th style="padding: 10px;">Nhóm Vấn đề</th>
+                            <th style="padding: 10px;">Quy tắc (Rule ID)</th>
+                            <th style="padding: 10px;">Hành động Xử lý</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td rowspan="4" style="vertical-align: middle; font-weight: bold;">
+                                1. Tính Đầy Đủ<br>
+                                <span style="font-weight: normal; font-style: italic;">(Completeness)</span>
+                            </td>
+                            <td>MISSING_ID</td>
+                            <td style="color: #c0392b; font-weight: bold;">DROP</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td>MISSING_PRICE</td>
+                            <td style="color: #2980b9; font-weight: bold;">SỬ DỤNG MEDIAN PRICE</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td>MISSING_HOST_ID</td>
+                            <td style="color: #c0392b; font-weight: bold;">DROP</td>
+                        </tr>
+                        <tr style="border-bottom: 2px solid #666;">
+                            <td>MISSING_REVIEW</td>
+                            <td style="color: #c0392b; font-weight: bold;">DROP</td>
+                        </tr>
+
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td rowspan="3" style="vertical-align: middle; font-weight: bold;">
+                                2. Tính Hợp Lệ<br>
+                                <span style="font-weight: normal; font-style: italic;">(Validity) - Định dạng</span>
+                            </td>
+                            <td>DTYPE_FIX_PRICE</td>
+                            <td style="color: #c0b12b; font-weight: bold;">FIX/KEEP</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td>DTYPE_FIX_HOST_RESPONSE</td>
+                            <td style="color: #c0b12b; font-weight: bold;">FIX/KEEP</td>
+                        </tr>
+                        <tr style="border-bottom: 2px solid #666;">
+                            <td>DTYPE_FIX_HOST_ACCEPT</td>
+                            <td style="color: #c0b12b; font-weight: bold;">FIX/KEEP</td>
+                        </tr>
+
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td rowspan="2" style="vertical-align: middle; font-weight: bold;">
+                                3. Tính Chính Xác<br>
+                                <span style="font-weight: normal; font-style: italic;">(Accuracy) - Logic</span>
+                            </td>
+                            <td>OUTLIER_PRICE_LOW</td>
+                            <td style="color: #2bc02d; font-weight: bold;">Gán cờ (Flag)</td>
+                        </tr>
+                        <tr>
+                            <td>OUTLIER_PRICE_HIGH</td>
+                            <td style="color: #2bc02d; font-weight: bold;">Gán cờ (Flag)</td>
+                        </tr>
+                        <tr></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <section>
+                <h2>Tác động Định lượng</h2>
+                <div style="text-align: left; font-size: 1em;">
+
+                    <div style="background-color: #e8f6f3; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <strong>A. Ảnh hưởng của Sửa lỗi Kiểu Dữ liệu (Dtype Fix)</strong>
+                        <ul>
+                            <li>Ảnh hưởng đến <strong>gần như toàn bộ dữ liệu</strong>.</li>
+                            <li>Chuyển đổi các cột chứa ký hiệu tiền tệ <code>$</code> và phần trăm <code>%</code> (ví dụ: <code>price</code>, <code>host_response_rate</code>) từ dạng chuỗi (String) sang số thực (Float) để phục vụ thống kê.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            <section>
+                <h2>Tác động Định lượng</h2>
+                <div style="text-align: left; font-size: 0.73em;">
+                    <div style="background-color: #fdf2e9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <strong>B. Ảnh hưởng của Lọc Ngoại lệ và Dữ liệu "Rác"(Accuracy & Relevance)</strong>
+                        <ul>
+                            <li><strong>Xử lý Giá (Price Outliers):</strong>
+                                <ul>
+                                    <li>Bangkok: Ghi nhận số lượng ngoại lệ cao nhất (<strong>~220 listings</strong>/snapshot bị gán cờ <code>PRICE_TOO_HIGH/LOW</code>).</li>
+                                    <li>Singapore: Ổn định hơn (<strong>~30 listings</strong>).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Xử lý Listing không hoạt động (Inactive Listings):</strong>
+                                <ul>
+                                    <li>Quy tắc <code>INACTIVE_365</code> phát hiện các phòng không có lịch trống trong 1 năm tới.</li>
+                                    <li><strong>Con số nổi bật:</strong> Tại Bangkok (03/2025), có tới <strong>4.907 listings</strong> rơi vào trạng thái này.</li>
+                                    <li><strong>Tác động:</strong> Nếu không loại bỏ, "Tổng nguồn cung" sẽ bị thổi phồng và "Tỷ lệ lấp đầy" bị kéo xuống thấp sai lệch.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            <section>
+                <h2>Kết luận về Hiệu quả QA</h2>
+                <ul>
+                    <li><strong>Sẵn sàng cho Tính toán:</strong> Chuẩn hóa 100% trường tiền tệ.</li>
+                    <li><strong>Phản ánh Thị trường Thực:</strong> Loại bỏ listing "ngủ đông" (tránh số liệu ảo về quy mô).</li>
+                    <li><strong>Kiểm soát Nhiễu:</strong> Tỷ lệ loại bỏ do lỗi logic < 0.3%.</li>
+                </ul>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h2>QUY TRÌNH TÍNH TOÁN KPI</h2>
+                <h3>(KEY PERFORMANCE INDICATORS)</h3>
+            </section>
+            <section>
+                <h2>Tổng quan</h2>
+                <div>Tính toán trên 2 cấp độ:</div>
+                <ul>
+                    <li><strong>Neighborhood:</strong> Chỉ số cụ thể cho từng khu vực/quận huyện.</li>
+                    <li><strong>City:</strong> Chỉ số tổng hợp cho toàn bộ thành phố.</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Cơ chế Tiền xử lý & Lọc nhiễu (Internal QA)</h2>
+                <ul>
+                    <li><strong>Xử lý giá trị rỗng (Missing Price Imputation):</strong> Điền khuyết bằng giá trị <em>trung vị (median)</em> của toàn bộ tập dữ liệu.</li>
+                    <li><strong>Loại bỏ ngoại lai (Outlier Removal):</strong> Chỉ giữ lại các listing có mức giá nằm trong khoảng <em>2% đến 98%</em> (quantile 0.02 - 0.98</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Các Chỉ số KPI</h2>
+                <div class="two-col" style="font-size: 0.6em;">
+                    <div class="col">
+                        <strong>A. Quy mô & Nguồn cung</strong><br>
+                        1. Active Listings<br>
+                        2. Room Type Distribution (%)<br>
+                        11. Short-term Rental %<br>
+                        12. Minimum Nights
+                        <br><br>
+                        <strong>B. Giá & Doanh thu</strong><br>
+                        3. Median Price<br>
+                        6. Average Price/Night<br>
+                        4. Price by Room Type<br>
+                        7. Average Annual Income
+                    </div>
+                    <div class="col">
+                        <strong>C. Hiệu suất & Lấp đầy</strong><br>
+                        5. Average Nights Booked<br>
+                        8. Median Availability 90<br>
+                        9. Seasonality / Occupancy Rate<br>
+                        10. Occupied Listings L12M
+                        <br><br>
+                        <strong>D. Hành vi Chủ nhà</strong><br>
+                        13. Listings per Host<br>
+                        14. Multi-listing Hosts %<br>
+                        15. Top Hosts Breakdown
+                    </div>
+                </div>
+            </section>
+            <section>
+                <h2>Cấu trúc Dữ liệu Đầu ra (Output Structure)</h2>
+                <div>Các file kết quả tại thư mục processed/{city}/{date}/:</div>
+                <ul>
+                    <li><code>kpi_snapshot.csv</code>: Bảng tổng hợp 14 chỉ số KPI.</li>
+                    <li><code>top_hosts.csv</code>: Thông tin 20 chủ nhà lớn nhất.</li>
+                    <li><code>KPI_Definitions.csv</code>: Giải thích ý nghĩa chỉ số.</li>
+                </ul>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h1>Trực quan hoá & Phân tích</h1>
+            </section>
+            <section>
+                <h2>Góc nhìn về Sản phẩm</h2>
+                <div class="img-placeholder">
+                    <img src="img/picture1.png" alt="Picture 1" style="width: auto; height: 350px;">
+                    <div style="font-size: 0.7em">Hình 1: Diễn biến tốc độ Gia nhập Thị trường (2010 - 2024)</div>
+                </div>
+                <ul style="font-size: 0.8em; text-align: left;">
+                    <li><strong>Bangkok:</strong> Sự hồi sinh chữ V, nguồn cung bùng nổ (ATH 2024).</li>
+                    <li><strong>Singapore:</strong> Sự khan hiếm, nguồn cung mới đóng băng (<200 host/năm).</li>
+                    <li><strong>Taipei:</strong> Trạng thái bão hòa, ổn định.</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Góc nhìn Cấu trúc</h2>
+                <div class="img-placeholder">
+                    <img src="img/picture2.png" alt="Picture 2" style="width: 700px; height: 350px;">
+                    <div style="font-size: 0.7em">Hình 2: Cơ cấu loại hình phòng theo thành phố</div>
+                </div>
+                <ul style="font-size: 0.8em; text-align: left;">
+                    <li><strong>Sự đảo ngược:</strong> Singapore bị áp đảo bởi Private Room (56%).</li>
+                    <li><strong>Nguyên nhân:</strong> Áp lực quy định pháp lý (HDB/Condo).</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Góc nhìn về Định giá</h2>
+                <div class="img-placeholder">
+                    <img src="img/picture4.png" alt="Picture 3" style="width: 700px; height: 350px;">
+                    <div style="font-size: 0.7em">Hình 4: Phân bố giá theo thành phố</div>
+                </div>
+                <ul style="font-size: 0.8em; text-align: left;">
+                    <li><strong>Singapore:</strong> "Sàn giá" rất cao. Shared Room (118 usd) đắt hơn Căn hộ tại Bangkok (52 usd).</li>
+                    <li><strong>Cấu trúc rủi ro:</strong> Singapore có độ biến động giá lớn.</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Góc nhìn Phân bổ</h2>
+                <div class="img-placeholder">
+                    <img src="img/img.png" alt="Picture 4" style="width: 700px; height: 350px;">
+                    <div style="font-size: 0.7em">Hình 5: So sánh mật độ phân bổ Listing tại 3 thành phố</div>
+                </div>
+                <ul style="font-size: 0.8em; text-align: left;">
+                    <li><strong>Singapore:</strong> Đơn cực lệch tâm (Cao cấp & Khan hiếm).</li>
+                    <li><strong>Bangkok:</strong> Đa cực, lan tỏa rộng khắp.</li>
+                    <li><strong>Taipei:</strong> Lan tỏa từ trung tâm ra vùng đệm.</li>
+                </ul>
+            </section>
+        </section>
+
+    </div>
+</div>
+
+
+<script src="revealjs/dist/reveal.js"></script>
+<script src="plugin/notes/notes.js"></script>
+<script src="plugin/markdown/markdown.js"></script>
+<script src="plugin/highlight/highlight.js"></script>
+<script src="plugin/math/math.js"></script>
+<script>
+    Reveal.initialize({
+        controlsLayout: "edges",
+        slideNumber: true,
+        hashOneBasedIndex: true,
+        hash: true,
+        plugins: [RevealMarkdown, RevealHighlight, RevealNotes, RevealMath.KaTeX],
+    });
+</script>
+</body>
+
+</html>
